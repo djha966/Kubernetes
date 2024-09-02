@@ -1,0 +1,44 @@
+You can restrict egress traffic with Kubernetes network policies by creating and applying NetworkPolicy objects that specify the desired egress rules.
+
+To create a NetworkPolicy that restricts egress traffic to a specific set of IP ranges, you can define an egress rule that specifies the to field with the desired IP ranges, and ports field if necessary.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/28
+    ports:
+    - protocol: TCP
+      port: 80
+You can also restrict egress traffic to a specific set of ports, protocols, and IP ranges.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  egress:
+  - ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+    to:
+    - ipBlock:
+        cidr: 10.0.0.0/28
+Note: CIDR 10.0.0.0/28 has 16 IP addresses ranging from 10.0.0.0 – 10.0.0.15.
+
+Once you have created the NetworkPolicy, you can apply it to the desired pods in your cluster by using the kubectl apply command.
+
+kubectl apply -f restrict-egress.yaml
+This will restrict egress traffic from the pods with label “app: myapp” to the specified IP ranges or ports.
